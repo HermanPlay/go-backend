@@ -54,10 +54,9 @@ Make sure you have the following installed:
 ### Usage
 
 Run the following command to start the server:
-
-    ```bash
-    docker compose up --build -d
-    ```
+```bash
+docker compose up --build -d
+```
 
 The server will be running at `http://localhost:8080`. You can customise the port in the `.env` file.
 
