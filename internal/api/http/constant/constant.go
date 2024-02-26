@@ -1,5 +1,7 @@
 package constant
 
+import "net/http"
+
 type ResponseStatus int
 type Headers int
 type General int
@@ -19,6 +21,10 @@ const (
 
 func (r ResponseStatus) GetResponseStatus() string {
 	return [...]string{"SUCCESS", "DATA_NOT_FOUND", "UNKNOWN_ERROR", "INVALID_REQUEST", "UNAUTHORIZED"}[r-1]
+}
+
+func (r ResponseStatus) GetResponseStatusCode() int {
+	return [...]int{http.StatusOK, http.StatusNotFound, http.StatusInternalServerError, http.StatusBadRequest, http.StatusUnauthorized}[r-1]
 }
 
 func (r ResponseStatus) GetResponseMessage() string {

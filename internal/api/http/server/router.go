@@ -15,18 +15,18 @@ func Init(init *http.Initialization) *gin.Engine {
 	api := router.Group("/api")
 	{
 		dev := api.Group("/dev")
-		dev.GET("/ping", func(c *gin.Context) {
-			c.JSON(200, gin.H{"message": "pong"})
-		})
+		dev.GET("/status", init.DevRoute.HealthCheck)
+
 		auth := api.Group("/auth")
 		auth.POST("/register", init.AuthRoute.RegisterUser)
 		auth.POST("/login", init.AuthRoute.LoginUser)
+
 		user := api.Group("/user")
 		user.Use(middleware.JwtAuthMiddleware(init.Cfg))
 		user.GET("", init.UserRoute.GetAllUserData)
 		user.POST("", init.UserRoute.AddUserData)
 		user.GET("/:userID", init.UserRoute.GetUserById)
-		user.PUT("/:userID", init.UserRoute.UpdateUserData)
+		user.PATCH("/:userID", init.UserRoute.UpdateUserData)
 		user.DELETE("/:userID", init.UserRoute.DeleteUser)
 	}
 

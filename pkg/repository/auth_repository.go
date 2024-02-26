@@ -1,8 +1,6 @@
 package repository
 
 import (
-	"log"
-
 	"errors"
 
 	"github.com/HermanPlay/backend/internal/api/http/util/token"
@@ -16,25 +14,11 @@ import (
 
 type AuthRepository interface {
 	LoginUser(userInput dto.UserLogin) (string, error)
-	CheckUserExist(email string) bool
 }
 
 type AuthRepositoryImpl struct {
 	db  *gorm.DB
 	cfg *config.Config
-}
-
-func (a AuthRepositoryImpl) CheckUserExist(email string) bool {
-	var user dao.User
-	err := a.db.Model(&user).Where("email = ?", email).Limit(1).Find(&user).Error
-	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			log.Println("User not found")
-			return false
-		}
-		panic(err)
-	}
-	return true
 }
 
 func verifyPassword(inputPassword, validPassword string) error {

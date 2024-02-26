@@ -27,7 +27,7 @@ func (a AuthServiceImpl) RegisterUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid request"})
 		return
 	}
-	if a.authRepository.CheckUserExist(userInput.Email) {
+	if a.userRepository.CheckUserExist(userInput.Email) {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Email already exist"})
 		return
 	}
@@ -49,7 +49,7 @@ func (a AuthServiceImpl) LoginUser(c *gin.Context) {
 		return
 	}
 
-	if !a.authRepository.CheckUserExist(userInput.Email) {
+	if !a.userRepository.CheckUserExist(userInput.Email) {
 		c.JSON(http.StatusNotFound, gin.H{"message": "Email doesn't exist"})
 		return
 	}

@@ -1,8 +1,7 @@
 package config
 
 import (
-	"log"
-	"os"
+	"errors"
 	"strconv"
 )
 
@@ -28,35 +27,46 @@ type (
 	}
 )
 
-func GetConfig() *Config {
-	app_port, err := strconv.Atoi(os.Getenv("port"))
+var errApiPort = errors.New("error parsing env variable port")
+var errApiSecret = errors.New("error parsing env variable api_secret")
+var errDbHost = errors.New("error parsing env variable db_host")
+var errDbPort = errors.New("error parsing env variable db_port")
+var errDbUser = errors.New("error parsing env variable db_user")
+var errDbPassword = errors.New("error parsing env variable db_password")
+var errDbName = errors.New("error parsing env variable db_name")
+
+func GetConfig(env map[string]string) (*Config, error) {
+	app_port, err := strconv.Atoi(env["port"])
 	if err != nil {
-		log.Fatal("Error parsing env variable port. Error: ", err)
+		return nil, errApiPort
 	}
-	api_secret := os.Getenv("api_secret")
+	api_secret := env["api_secret"]
+	if len(api_secret) == 0 {
+		return nil, errApiSecret
+	}
 	app := App{
 		Port:       app_port,
 		Api_secret: api_secret,
 	}
-	db_host := os.Getenv("db_host")
+	db_host := env["db_host"]
 	if len(db_host) == 0 {
-		log.Fatal("Error parsing env variable db_host. Error: db_host is empty")
+		return nil, errDbHost
 	}
-	db_port, err := strconv.Atoi(os.Getenv("db_port"))
+	db_port, err := strconv.Atoi(env["db_port"])
 	if err != nil {
-		log.Fatal("Error parsing env variable db_port. Error: ", err)
+		return nil, errDbPort
 	}
-	db_user := os.Getenv("db_user")
-	if len(db_host) == 0 {
-		log.Fatal("Error parsing env variable db_user. Error: db_user is empty")
+	db_user := env["db_user"]
+	if len(db_user) == 0 {
+		return nil, errDbUser
 	}
-	db_password := os.Getenv("db_password")
-	if len(db_host) == 0 {
-		log.Fatal("Error parsing env variable db_password. Error: db_password is empty")
+	db_password := env["db_password"]
+	if len(db_password) == 0 {
+		return nil, errDbPassword
 	}
-	db_name := os.Getenv("db_name")
-	if len(db_host) == 0 {
-		log.Fatal("Error parsing env variable db_name. Error: db_name is empty")
+	db_name := env["db_name"]
+	if len(db_name) == 0 {
+		return nil, errDbName
 	}
 
 	db := Db{
@@ -66,9 +76,8 @@ func GetConfig() *Config {
 		Password: db_password,
 		DBName:   db_name,
 	}
-
 	return &Config{
 		App: app,
 		Db:  db,
-	}
+	}, nil
 }

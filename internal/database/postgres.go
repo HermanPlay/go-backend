@@ -12,7 +12,7 @@ type postgresDatabase struct {
 	Db *gorm.DB
 }
 
-func NewPostgresDatabase(cfg *config.Config) Database {
+func NewPostgresDatabase(cfg *config.Config) (Database, error) {
 	dsn := fmt.Sprintf(
 		"postgres://%s:%s@%s:%v/%s?sslmode=disable",
 		cfg.Db.User,
@@ -23,10 +23,10 @@ func NewPostgresDatabase(cfg *config.Config) Database {
 	)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		panic("failed to connect database")
+		return nil, fmt.Errorf("cannot open db connection")
 	}
 
-	return &postgresDatabase{Db: db}
+	return &postgresDatabase{Db: db}, nil
 }
 
 func (p *postgresDatabase) Connect() *gorm.DB {

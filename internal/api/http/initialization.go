@@ -10,6 +10,7 @@ import (
 
 type Initialization struct {
 	Cfg            *config.Config
+	DevRoute       routes.DevRoute
 	UserRepository repository.UserRepository
 	UserService    service.UserService
 	UserRoute      routes.UserRoute
@@ -20,6 +21,7 @@ type Initialization struct {
 
 func NewInitialization(
 	config *config.Config,
+	devRoute routes.DevRoute,
 	userRepo repository.UserRepository,
 	userService service.UserService,
 	UserRoute routes.UserRoute,
@@ -29,6 +31,7 @@ func NewInitialization(
 ) *Initialization {
 	return &Initialization{
 		Cfg:            config,
+		DevRoute:       devRoute,
 		UserRepository: userRepo,
 		UserService:    userService,
 		UserRoute:      UserRoute,
@@ -39,14 +42,19 @@ func NewInitialization(
 }
 
 func Init(cfg *config.Config) *Initialization {
-	pgDb := database.NewPostgresDatabase(cfg).Connect()
+	db, err := database.NewPostgresDatabase(cfg)
+	if err != nil {
+		panic(err)
+	}
+	pgDb := db.Connect()
+	devRouteImpl := routes.NewDevRoute()
 	userRepositoryImpl := repository.NewUserRepository(pgDb)
 	userServiceImpl := service.NewUserService(userRepositoryImpl)
 	userRouteImpl := routes.NewUserRoute(userServiceImpl)
 	authRepositoryImpl := repository.NewAuthRepository(pgDb, cfg)
 	authServiceImpl := service.NewAuthService(authRepositoryImpl, userRepositoryImpl)
 	authRouteImpl := routes.NewAuthRoute(authServiceImpl)
-	initialization := NewInitialization(cfg, userRepositoryImpl, userServiceImpl, userRouteImpl, authRepositoryImpl, authServiceImpl, authRouteImpl)
+	initialization := NewInitialization(cfg, devRouteImpl, userRepositoryImpl, userServiceImpl, userRouteImpl, authRepositoryImpl, authServiceImpl, authRouteImpl)
 
 	return initialization
 }

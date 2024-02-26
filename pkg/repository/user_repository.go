@@ -11,6 +11,7 @@ type UserRepository interface {
 	FindUserById(id int) (dao.User, error)
 	Save(user *dao.User) (dao.User, error)
 	DeleteUserById(id int) error
+	CheckUserExist(email string) bool
 }
 
 type UserRepositoryImpl struct {
@@ -57,6 +58,19 @@ func (u UserRepositoryImpl) DeleteUserById(id int) error {
 		return err
 	}
 	return nil
+}
+
+func (u UserRepositoryImpl) CheckUserExist(email string) bool {
+	var user dao.User
+	err := u.db.Model(&user).Where("email = ?", email).First(&user).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			log.Println("User not found")
+			return false
+		}
+		panic(err)
+	}
+	return true
 }
 
 func NewUserRepository(db *gorm.DB) *UserRepositoryImpl {

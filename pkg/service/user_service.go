@@ -9,6 +9,7 @@ import (
 	"github.com/HermanPlay/backend/internal/api/http/constant"
 	"github.com/HermanPlay/backend/internal/api/http/util"
 	"github.com/HermanPlay/backend/pkg/domain/dao"
+	"github.com/HermanPlay/backend/pkg/domain/dto"
 	"github.com/HermanPlay/backend/pkg/repository"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
@@ -32,7 +33,7 @@ func (u UserServiceImpl) UpdateUserData(c *gin.Context) {
 	log.Info("start to execute program update user data by id")
 	userID, _ := strconv.Atoi(c.Param("userID"))
 
-	var request dao.User
+	var request dto.UserUpdate
 	if err := c.ShouldBindJSON(&request); err != nil {
 		log.Error("Happened error when mapping request from FE. Error", err)
 		// pkg.PanicException(constant.InvalidRequest)
@@ -42,6 +43,11 @@ func (u UserServiceImpl) UpdateUserData(c *gin.Context) {
 	if err != nil {
 		log.Error("Happened error when get data from database. Error", err)
 		// pkg.PanicException(constant.DataNotFound)
+	}
+
+	if u.userRepository.CheckUserExist(request.Email) && data.Email != request.Email {
+		c.JSON(http.StatusConflict, map[string]string{"message": "given email already exists"})
+		return
 	}
 
 	data.Email = request.Email

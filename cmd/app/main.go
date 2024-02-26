@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"strconv"
 
 	"github.com/HermanPlay/backend/internal/api/http"
@@ -10,11 +11,14 @@ import (
 )
 
 func main() {
-	err := godotenv.Load("././.env")
+	env, err := godotenv.Read("././.env")
 	if err != nil {
 		panic(err)
 	}
-	cfg := config.GetConfig()
+	cfg, err := config.GetConfig(env)
+	if err != nil {
+		log.Fatal("No config!")
+	}
 
 	init := http.Init(cfg)
 	app := server.Init(init)
