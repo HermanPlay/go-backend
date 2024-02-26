@@ -15,8 +15,8 @@ Structure description:
     - `database` database interfaces related stuff
 - `pkg` implementations of the business logic
     - `domain`
-        - `dto` models (entities) which are used to communicate with database
-        - `dao` models used to retrieve and give information to the routers
+        - `dao` models (entities) which are used to communicate with database
+        - `dto` models used to retrieve from and give information to the routers
     - `repository` implementation of database communication depending on usecase
     - `service` core business logic depending on use case 
 
